@@ -1,0 +1,184 @@
+.profile-container {
+    display: flex;
+    width: 75%;
+    height: 75vh;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+.card-profile {
+    width: 15vw;
+    height: 18vw;
+    background-color: var(--lumo-background-color);
+    border-radius: var(--lumo-border-radius-m);
+    box-shadow: var(--lumo-box-shadow-s);
+    padding: var(--lumo-space-m);
+    margin: var(--lumo-space-m);
+}
+
+.card-profile-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+.card-profile-layout img {
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    user-select: none;
+}
+
+.card-profile-layout h1 {
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 0 0.4em white;
+    user-select: none;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    height: 100%;
+}
+
+.accounts-container {
+    display: flex;
+    margin: var(--lumo-space-m);
+    flex-wrap: wrap
+}
+
+.account {
+    align-items: center;
+    justify-content: center;
+    background-color: var(--lumo-background-color);
+    border-radius: var(--lumo-border-radius-m);
+    border: 1px solid transparent;
+    display: flex;
+    padding: 0.5rem 1rem;
+    transition: all .2s ease-in-out;
+    width: fit-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.account:hover {
+    background-color: var(--lumo-shade-10pct);
+    border-color: var(--lumo-primary-color);
+    color: var(--lumo-primary-color);
+}
+
+.account.selected {
+    background-color: var(--lumo-shade-10pct);
+    border-color: var(--lumo-primary-color);
+    color: var(--lumo-primary-color);
+    cursor: pointer;
+}
+
+.rank-card {
+    box-shadow: var(--lumo-box-shadow-s);
+    border-radius: var(--lumo-border-radius-m);
+    background-color: var(--lumo-background-color);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 40%;
+    height: 100px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: white;
+    padding: 0;
+}
+
+.info p {
+    margin-bottom: -8px;
+    margin-top: 0;
+    margin-right: 20px;
+    white-space: nowrap;
+}
+
+.background {
+    background-position: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    bottom: 0;
+    left: 0;
+    opacity: .65;
+    position: relative;
+    right: 0;
+    top: 0;
+    width: 65%;
+    height: 100%;
+}
+
+#heading {
+    align-items: center;
+    border-left: 4px solid var(--lumo-primary-color);
+    display: flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    color: white;
+}
+
+#bold {
+    font-weight: 600;
+}
+
+#time {
+    font-weight: 400;
+    color: var(--lumo-tint-40pct);
+}
+
+@media screen and (max-width: 1120px) {
+    .profile-container {
+        flex-direction: column;
+    }
+    .card-profile {
+        width: 100%;
+        height: 100%;
+    }
+
+    .card-profile-layout {
+        width: 100%;
+        text-align: center;
+    }
+    .card-profile-layout img {
+        width: 30%;
+        height: auto;
+    }
+
+    .info-container {
+        width: 100%;
+    }
+
+    .rank-card {
+        width: 100%;
+    }
+
+    .accounts-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .account {
+        width: 20%;
+    }
+
+    #heading {
+        width: 100%;
+        text-align: center;
+    }
+}

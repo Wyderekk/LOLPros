@@ -1,0 +1,38 @@
+.header {
+    width: 30vw;
+    height: 5vh;
+    background-color: var(--lumo-background-color);
+    box-shadow: var(--lumo-box-shadow-s);
+    padding: 1rem 1.5rem;
+    border-radius: 0.2rem;
+}
+
+.ladder-entry {
+    border-radius: var(--lumo-border-radius-m);
+    background-color: var(--lumo-background-color);
+}
+
+.list-container {
+    width: 25%;
+    height: 90%;
+}
+
+@media screen and (max-width: 1355px) {
+    .header {
+        width: 90vw;
+    }
+
+    .ladder-entry {
+        width: 90%;
+    }
+
+    .ladder-entry .avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .list-container {
+        width: 90%;
+    }
+}
+
