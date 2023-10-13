@@ -1,0 +1,33 @@
+[theme~="dark"] {
+  --lumo-base-color: hsl(214, 2%, 9%);
+  --lumo-shade-5pct: rgba(22, 23, 24, 0.05);
+  --lumo-shade-10pct: rgba(22, 23, 24, 0.1);
+  --lumo-shade-20pct: rgba(22, 23, 24, 0.2);
+  --lumo-shade-30pct: rgba(22, 23, 24, 0.3);
+  --lumo-shade-40pct: rgba(22, 23, 24, 0.4);
+  --lumo-shade-50pct: rgba(22, 23, 24, 0.5);
+  --lumo-shade-60pct: rgba(22, 23, 24, 0.6);
+  --lumo-shade-70pct: rgba(22, 23, 24, 0.7);
+  --lumo-shade-80pct: rgba(22, 23, 24, 0.8);
+  --lumo-shade-90pct: rgba(22, 23, 24, 0.9);
+  --lumo-shade: hsl(214, 3%, 9%);
+  --lumo-tint-5pct: rgba(249, 247, 253, 0.05);
+  --lumo-tint-10pct: rgba(249, 247, 253, 0.1);
+  --lumo-tint-20pct: rgba(249, 247, 253, 0.2);
+  --lumo-tint-30pct: rgba(249, 247, 253, 0.3);
+  --lumo-tint-40pct: rgba(249, 247, 253, 0.4);
+  --lumo-tint-50pct: rgba(249, 247, 253, 0.5);
+  --lumo-tint-60pct: rgba(249, 247, 253, 0.6);
+  --lumo-tint-70pct: rgba(249, 247, 253, 0.7);
+  --lumo-tint-80pct: rgba(249, 247, 253, 0.8);
+  --lumo-tint-90pct: rgba(249, 247, 253, 0.9);
+  --lumo-tint: hsl(264, 62%, 98%);
+  --lumo-primary-text-color: rgba(83, 35, 211, 0.76);
+  --lumo-primary-color-50pct: rgb(101, 42, 239, 0.5);
+  --lumo-primary-color-10pct: rgba(101, 42, 239, 0.1);
+  --lumo-primary-color: rgb(64, 61, 199);
+  --lumo-primary-contrast-color: #ffffff;
+  --lumo-header-text-color: hsl(264, 100%, 50%);
+  --lumo-body-text-color: hsl(264, 0%, 98%);
+  --lumo-background-color: #22262b;
+}

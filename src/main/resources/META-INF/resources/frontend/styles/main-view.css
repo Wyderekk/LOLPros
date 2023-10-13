@@ -1,0 +1,131 @@
+.card-container {
+    background-color: var(--lumo-background-color);
+    height: 75vh;
+    width: 45vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15vh;
+    border-radius: var(--lumo-border-radius-m)
+}
+
+.search-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40vw;
+    height: 10%;
+    background-color: transparent;
+}
+
+.leaderboard-card {
+    width: 95%;
+    height: 80%;
+}
+
+.leaderboard-summoner {
+    height: 9.5%;
+    width: 100%;
+    display: flex;
+    background: var(--lumo-tint-5pct);
+    margin: 0.5%;
+    border-radius: var(--lumo-border-radius-m);
+    box-shadow: var(--lumo-box-shadow-s);
+}
+
+.leaderboard-summoner p {
+    align-items: center;
+    display: flex;
+    flex-basis: 20%;
+    flex-grow: 1;
+    color: #eee;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 5%;
+    transition: color .2s ease-in-out,background-color .2s ease-in-out;
+}
+
+.leaderboard-summoner p:hover {
+    cursor: pointer;
+}
+
+.leaderboard-summoner-role {
+    width: 8%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2%;
+}
+
+.leaderboard-summoner-role img {
+    height: 32px;
+    width: 32px;
+    user-select: none;
+}
+
+.leaderboard-summoner-rank {
+    width: 8%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.leaderboard-summoner-rank img {
+    height: 29.8px;
+    width: 32px;
+    user-select: none;
+    overflow: clip;
+    overflow-clip-margin: content-box;
+}
+
+.leaderboard-summoner-rank p {
+    align-items: center;
+    font-size: 10px;
+    position: absolute;
+    margin-right: 5%;
+    margin-top: 2%;
+    user-select: none;
+}
+
+.header-card {
+    margin-top: 1%;
+    width: 95%;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.header-card h4 {
+    color: var(--lumo-primary-text-color);
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.header-complete-ladder {
+    color: var(--lumo-tint);
+}
+
+.header-complete-ladder:hover {
+    text-decoration: none;
+}
+
+@media screen and (max-width: 1355px) {
+    .card-container {
+        width: 90vw;
+        height: 75vh;
+    }
+
+    .search-card {
+        width: 90vw;
+    }
+
+    .leaderboard-card {
+        width: 90%;
+        height: 80%;
+    }
+
+    .header-card {
+        width: 90%;
+    }
+}
