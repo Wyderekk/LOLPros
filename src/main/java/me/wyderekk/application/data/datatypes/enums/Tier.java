@@ -30,6 +30,8 @@ public enum Tier {
     public static Tier getByName(String name) {
         String[] tier = name.split("_");
         return Arrays.stream(Tier.values())
-                .filter(e -> e.name().equalsIgnoreCase(tier[1])).findAny().orElse(null);
+                .filter(e -> e.name().equalsIgnoreCase(tier.length == 2 ? tier[1] : name))
+                .findAny()
+                .orElse(null);
     }
 }

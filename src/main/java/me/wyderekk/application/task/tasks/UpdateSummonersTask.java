@@ -7,9 +7,9 @@ import me.wyderekk.application.data.database.SQLite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateDatabaseTask implements Runnable {
+public class UpdateSummonersTask implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateDatabaseTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateSummonersTask.class);
     private static final OkHttpClient client = new OkHttpClient();
 
     @Override

@@ -3,9 +3,10 @@ package me.wyderekk.application.data.database;
 import me.wyderekk.application.data.dao.AccountDataDao;
 import me.wyderekk.application.data.datatypes.AccountData;
 import me.wyderekk.application.data.datatypes.comparator.AccountDataComparator;
+import me.wyderekk.application.data.datatypes.enums.Badge;
 import me.wyderekk.application.data.datatypes.enums.SortBy;
 import me.wyderekk.application.task.TaskRunner;
-import me.wyderekk.application.task.tasks.UpdateDatabaseTask;
+import me.wyderekk.application.task.tasks.UpdateSummonersTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -26,7 +27,7 @@ public class SQLite {
             Class.forName("org.sqlite.JDBC");
             con = DriverManager.getConnection(URL);
             createTable();
-            TaskRunner.runInBackground(new UpdateDatabaseTask(), 1, 3, TimeUnit.HOURS);
+            TaskRunner.runInBackground(new UpdateSummonersTask(), 1, 3, TimeUnit.HOURS);
             hookDisconnect();
             LOGGER.info("Connected to database");
         } catch (Exception e) {
@@ -55,8 +56,16 @@ public class SQLite {
                     json_data TEXT
                 );
                 """;
+        String SQL2 =
+                """
+                CREATE TABLE IF NOT EXISTS badges (
+                    owner TEXT PRIMARY KEY,
+                    badges TEXT
+                );
+                """;
         try {
             con.createStatement().execute(SQL);
+            con.createStatement().execute(SQL2);
         } catch (SQLException e) {
             LOGGER.error("Failed to create table", e);
         }
@@ -130,5 +139,51 @@ public class SQLite {
             LOGGER.error("Failed to check if account data exists", e);
         }
         return false;
+    }
+
+    public static void saveBadges(String owner, String badges) {
+        String SQL = badgesExist(owner) ? "REPLACE INTO badges (owner, badges) VALUES (?, ?)" : "INSERT INTO badges (owner, badges) VALUES (?, ?)";
+        try (PreparedStatement updateStatement = con.prepareStatement(SQL)) {
+            updateStatement.setString(1, owner);
+            updateStatement.setString(2, badges);
+            updateStatement.executeUpdate();
+            LOGGER.info("Saved badges for {}", owner);
+        } catch (SQLException e) {
+            LOGGER.error("Failed to save badges", e);
+        }
+    }
+
+    private static boolean badgesExist(String owner) {
+        String checkSQL = "SELECT COUNT(*) FROM badges WHERE owner = ?";
+
+        try (PreparedStatement checkStatement = con.prepareStatement(checkSQL)) {
+            checkStatement.setString(1, owner);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to check if badges exist", e);
+        }
+        return false;
+    }
+
+    public static ArrayList<Badge> getBadges(String owner) {
+        String SQL = "SELECT * FROM badges WHERE owner = ?";
+        ArrayList<Badge> badges = new ArrayList<>();
+        try (PreparedStatement preparedStatement = con.prepareStatement(SQL)) {
+            preparedStatement.setString(1, owner);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String badgesString = resultSet.getString("badges").toUpperCase();
+                    LOGGER.info("Returning badges {} for {}", badgesString, owner);
+                    for (String badge : badgesString.split(",")) {
+                        badges.add(Badge.valueOf(badge));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to get badges", e);
+        }
+        return badges;
     }
 }

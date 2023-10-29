@@ -5,6 +5,7 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import me.wyderekk.application.data.database.SQLite;
+import me.wyderekk.application.discord.Core;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,5 +28,6 @@ public class Application implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
         SQLite.connect();
+        Core.runBot();
     }
 }

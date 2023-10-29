@@ -1,16 +1,22 @@
 package me.wyderekk.application.views;
 
+import com.vaadin.flow.component.Svg;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import me.wyderekk.application.data.database.SQLite;
 import me.wyderekk.application.data.datatypes.AccountData;
 import me.wyderekk.application.data.datatypes.SummonerName;
+import me.wyderekk.application.data.datatypes.enums.Badge;
 import me.wyderekk.application.data.datatypes.enums.SortBy;
 import me.wyderekk.application.data.util.AccountDataUtil;
 
@@ -59,6 +65,22 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
 
         H1 profileCardName = new H1(firstAccount.owner());
 
+        Div badges = new Div();
+        badges.setClassName("badges");
+
+        ArrayList<Badge> userBadges = SQLite.getBadges(firstAccount.owner().toLowerCase());
+        userBadges.forEach(badge -> {
+
+            Image badgeImage = new Image("frontend/img/badges/" + badge.name().toLowerCase() + ".svg", badge.name());
+            badgeImage.setClassName("badge");
+
+            Tooltip tooltip = Tooltip.forComponent(badgeImage);
+            tooltip.setText(badge.name().substring(0, 1).toUpperCase() + badge.name().substring(1).toLowerCase());
+            tooltip.setPosition(Tooltip.TooltipPosition.TOP);
+
+            badges.add(badgeImage);
+        });
+
         Div roleKeypoint = new Div();
         roleKeypoint.setClassName("role-keypoint");
 
@@ -69,7 +91,7 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         roleText.setText(firstAccount.position().getName());
 
         roleKeypoint.add(roleImage, roleText);
-        cardProfileLayout.add(profileCardImage, profileCardName, roleKeypoint);
+        cardProfileLayout.add(profileCardImage, profileCardName, badges, roleKeypoint);
         cardProfile.add(cardProfileLayout);
 
         // rankings card
@@ -88,6 +110,8 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         globalRankingText.setId("bold");
 
         Span globalRankingNumber = new Span();
+        globalRankingNumber.setId("bold");
+
         SQLite.getSortedAccountData(SortBy.CURRENT_RANK).stream()
                 .filter(accountData -> accountData.owner().equals(firstAccount.owner()))
                 .findFirst()
@@ -102,11 +126,14 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         positionRankingText.setId("bold");
 
         Span positionRankingNumber = new Span();
+        positionRankingNumber.setId("bold");
 
+        // gets all accounts with the same position as the first account
         List<AccountData> positionList = SQLite.getSortedAccountData(SortBy.CURRENT_RANK).stream()
                 .filter(accountData -> accountData.position().equals(firstAccount.position()))
                 .toList();
 
+        // gets the position of the first account in the list
         positionList.stream()
                 .filter(accountData -> accountData.owner().equals(firstAccount.owner()))
                 .findFirst()
@@ -189,6 +216,7 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
 
                 selectedAccount.set(accountDataArrayList.indexOf(profile));
 
+                // updates rank cards and last summoner names
                 currentRank.removeAll();
                 createRankCard(currentRank, accountDataArrayList.get(selectedAccount.get()));
 
@@ -207,8 +235,6 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
             accountsContainer.add(div);
         });
 
-        // last summoner names
-
         accountInfoLayout.add(currentRankText, currentRank, peakRankText, peakRank, lastSummonerNamesText, lastSummonerNames);
 
         infoContainer.add(accountsContainer, accountInfoLayout);
@@ -222,7 +248,7 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
 
         Div background = new Div();
         background.setClassName("background");
-        background.getStyle().setBackground("url(frontend/img/" + accountData.rank().tier().getName().toLowerCase() + ".png) center/cover no-repeat");
+        background.getStyle().setBackground("url(frontend/img/" + accountData.rank().tier().getName().toLowerCase() + ".webp) center/cover no-repeat");
 
         Div info = new Div();
         info.setClassName("info");
@@ -247,7 +273,7 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
 
         Div background = new Div();
         background.setClassName("background");
-        background.getStyle().setBackground("url(frontend/img/" + accountData.peak().tier().getName().toLowerCase() + ".png) center/cover no-repeat");
+        background.getStyle().setBackground("url(frontend/img/" + accountData.peak().tier().getName().toLowerCase() + ".webp) center/cover no-repeat");
 
         Div info = new Div();
         info.setClassName("info");
