@@ -8,6 +8,10 @@
 *.iml
 .DS_Store
 
+#Database file
+database.db
+# Change initial delay to 0 in SQLite class to load database from lolpros api ^^
+
 # The following files are generated/updated by vaadin-maven-plugin
 node_modules/
 frontend/generated/

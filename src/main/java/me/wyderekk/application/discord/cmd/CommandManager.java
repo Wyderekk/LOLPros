@@ -12,7 +12,9 @@ public class CommandManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
     private final ArrayList<ICommand> commands = new ArrayList<>();
+
     public static CommandManager INSTANCE = new CommandManager();
+
 
     private CommandManager() {
         LOGGER.info("Initializing commands...");

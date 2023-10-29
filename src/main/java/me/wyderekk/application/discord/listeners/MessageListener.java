@@ -17,7 +17,7 @@ public class MessageListener extends ListenerAdapter {
         if(!args[0].startsWith(PREFIX)) return;
 
         CommandManager.INSTANCE.getCommands().stream()
-                .filter(command -> command.getCommandName().equalsIgnoreCase(args[0]))
+                .filter(command -> command.getCommandName().equalsIgnoreCase(args[0].replaceFirst(PREFIX, "")))
                 .forEach(command -> command.executeCommand(new CommandEvent(event)));
     }
 }
