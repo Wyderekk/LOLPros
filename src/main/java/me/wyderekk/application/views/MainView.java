@@ -95,7 +95,7 @@ public class MainView extends VerticalLayout {
         Div rank = new Div();
         rank.setClassName("leaderboard-summoner-rank");
 
-        Paragraph rankText = new Paragraph(String.valueOf(accountData.rank().lp()));
+        Span rankText = new Span(String.valueOf(accountData.rank().lp()));
         rankText.setClassName("leaderboard-summoner-rank-text");
 
         Image rankImage = new Image("frontend/icons/" + accountData.rank().tier().getName().toLowerCase() + ".svg", String.valueOf(accountData.rank().division().ordinal()));

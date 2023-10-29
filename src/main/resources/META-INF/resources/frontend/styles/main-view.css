@@ -1,12 +1,12 @@
 .card-container {
     background-color: var(--lumo-background-color);
+    border-radius: var(--lumo-border-radius-m);
     height: 75vh;
     width: 45vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 15vh;
-    border-radius: var(--lumo-border-radius-m)
 }
 
 .search-card {
@@ -15,7 +15,6 @@
     align-items: center;
     width: 40vw;
     height: 10%;
-    background-color: transparent;
 }
 
 .leaderboard-card {
@@ -27,8 +26,8 @@
     height: 9.5%;
     width: 100%;
     display: flex;
-    background: var(--lumo-tint-5pct);
     margin: 0.5%;
+    background: var(--lumo-tint-5pct);
     border-radius: var(--lumo-border-radius-m);
     box-shadow: var(--lumo-box-shadow-s);
 }
@@ -78,11 +77,9 @@
     overflow-clip-margin: content-box;
 }
 
-.leaderboard-summoner-rank p {
-    align-items: center;
+.leaderboard-summoner-rank span {
     font-size: 10px;
     position: absolute;
-    margin-right: 5%;
     margin-top: 2%;
     user-select: none;
 }
@@ -125,7 +122,15 @@
         height: 80%;
     }
 
+    .leaderboard-summoner-rank, .leaderboard-summoner-role {
+        padding: 0 2%;
+    }
+
     .header-card {
         width: 90%;
+    }
+
+    .leaderboard-summoner-rank span {
+        margin-top: 8%;
     }
 }

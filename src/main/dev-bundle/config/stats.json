@@ -286,7 +286,7 @@
   "messageListConnector.js": "480d7092b9fe42aab45756eb4287b2c4b0d6e5d38514e967543bc5c317948c18",
   "selectConnector.js": "bd4277e735d390853603351ddd963233349b702789ddf8ce000df5179bb30523",
   "styles/ladder-view.css": "9fc3addeb05ddb9d68e108d54fbb04a91283cb2ac18a2033acc7b302bef3f79a",
-  "styles/main-view.css": "8a7eb681d78a103306de9b05718abfa845167d199020d8b6d6cbde005204bac4",
+  "styles/main-view.css": "cfea1af8f2df08f61b108a1f630177f2161e3acddb9213914bbbed9c07330428",
   "styles/player-info.css": "71e68804e098d07f6631051a2f891f650dbec38268cc7eb70e23f76397dd2e5b",
   "theme-util.js": "828ba8154b5d2d762ade6ed6f0614691c68db929b69c3c54250858a077960ba3",
   "tooltip.ts": "b7e9af67169277b94cab722d244340c3a9d463bcf4de2aaa84dddcebbd59447b",
@@ -300,7 +300,7 @@
   "application": "{\n  \"lumoImports\" : [ \"typography\", \"color\", \"spacing\", \"badge\", \"utility\" ]\n}"
  },
  "entryScripts": [
-  "VAADIN/build/indexhtml-764e449e.js"
+  "VAADIN/build/indexhtml-ee070234.js"
  ],
  "webComponents": [],
  "cvdlModules": {
@@ -335,6 +335,6 @@
  },
  "packageJsonHash": "2e5b002dfea194d0021170f05797ae72085b5094e257f33185f59fcaa2febf4a",
  "indexHtmlGenerated": [
-  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-764e449e.js\"></script>"
+  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-ee070234.js\"></script>"
  ]
 }
