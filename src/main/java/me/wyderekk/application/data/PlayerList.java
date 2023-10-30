@@ -25,12 +25,9 @@ public class PlayerList {
         if (inputStream != null) {
             try (Scanner sc = new Scanner(inputStream)) {
                 while (sc.hasNextLine()) {
-                    String[] line = sc.nextLine().split(";");
-                    players.add(line[0]);
-                    LOGGER.info("Added {} to player list", line[0]);
-                    if (line.length == 2) {
-                        SQLite.saveBadges(line[0], line[1]);
-                    }
+                    String line = sc.nextLine();
+                    players.add(line);
+                    LOGGER.info("Added {} to player list", line);
                 }
             }
         } else {

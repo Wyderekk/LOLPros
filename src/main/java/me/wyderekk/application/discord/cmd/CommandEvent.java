@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.Arrays;
+
 public class CommandEvent {
 
     private JDA jda;
@@ -23,6 +25,8 @@ public class CommandEvent {
 
     private MessageReceivedEvent messageReceivedEvent;
 
+    private String[] arguments;
+
     /**
      * Constructor used to save the Data.
      *
@@ -31,6 +35,8 @@ public class CommandEvent {
      * @param guild                        the {@link Guild} Entity.
      * @param message                      the {@link Message} Entity.
      * @param textChannel                  the {@link TextChannel} Entity.
+     * @param messageReceivedEvent         the {@link MessageReceivedEvent} Entity.
+     * @param arguments                    the {@link String[]} Entity.
      */
     public CommandEvent(MessageReceivedEvent messageReceivedEvent) {
         this.messageReceivedEvent = messageReceivedEvent;
@@ -39,6 +45,7 @@ public class CommandEvent {
         this.guild = messageReceivedEvent.getGuild();
         this.message = messageReceivedEvent.getMessage();
         this.channel = messageReceivedEvent.getChannel();
+        this.arguments = Arrays.copyOfRange(message.getContentRaw().split("\\s+"), 1, message.getContentRaw().split("\\s+").length);
     }
 
     public JDA getJDA() {
@@ -65,5 +72,8 @@ public class CommandEvent {
         return messageReceivedEvent;
     }
 
+    public String[] getArguments() {
+        return arguments;
+    }
 
 }

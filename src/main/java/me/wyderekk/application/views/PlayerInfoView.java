@@ -69,17 +69,20 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         badges.setClassName("badges");
 
         ArrayList<Badge> userBadges = SQLite.getBadges(firstAccount.owner().toLowerCase());
-        userBadges.forEach(badge -> {
 
-            Image badgeImage = new Image("frontend/img/badges/" + badge.name().toLowerCase() + ".svg", badge.name());
-            badgeImage.setClassName("badge");
+        if(!userBadges.isEmpty()) {
+            userBadges.forEach(badge -> {
 
-            Tooltip tooltip = Tooltip.forComponent(badgeImage);
-            tooltip.setText(badge.name().substring(0, 1).toUpperCase() + badge.name().substring(1).toLowerCase());
-            tooltip.setPosition(Tooltip.TooltipPosition.TOP);
+                Image badgeImage = new Image("frontend/img/badges/" + badge.name().toLowerCase() + ".svg", badge.name());
+                badgeImage.setClassName("badge");
 
-            badges.add(badgeImage);
-        });
+                Tooltip tooltip = Tooltip.forComponent(badgeImage);
+                tooltip.setText(badge.name().substring(0, 1).toUpperCase() + badge.name().substring(1).toLowerCase());
+                tooltip.setPosition(Tooltip.TooltipPosition.TOP);
+
+                badges.add(badgeImage);
+            });
+        }
 
         Div roleKeypoint = new Div();
         roleKeypoint.setClassName("role-keypoint");
@@ -116,6 +119,7 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
                 .filter(accountData -> accountData.owner().equals(firstAccount.owner()))
                 .findFirst()
                 .ifPresent(accountData -> globalRankingNumber.setText("#" + (SQLite.getSortedAccountData(SortBy.CURRENT_RANK).indexOf(accountData) + 1)));
+
         globalRanking.add(globalRankingText, globalRankingNumber);
 
         Div positionRanking = new Div();

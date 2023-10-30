@@ -24,7 +24,8 @@ public class Core {
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_PRESENCES,
-                GatewayIntent.GUILD_EMOJIS_AND_STICKERS
+                GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                GatewayIntent.MESSAGE_CONTENT
         );
         try {
             ShardManager shardManager = builder.build();

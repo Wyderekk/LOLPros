@@ -12,8 +12,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class SQLite {
 
@@ -86,6 +88,7 @@ public class SQLite {
 
     public static ArrayList<AccountData> getAccountData(String owner) {
         String SQL = "SELECT * FROM account_data WHERE json_extract(json_data, '$.owner') COLLATE NOCASE = ?";
+
         ArrayList<AccountData> accountDataArrayList = new ArrayList<>();
         try (PreparedStatement preparedStatement = con.prepareStatement(SQL)) {
             preparedStatement.setString(1, owner);
@@ -101,6 +104,7 @@ public class SQLite {
 
         Comparator<AccountData> comparator = AccountDataComparator.getComparator(SortBy.CURRENT_RANK);
         accountDataArrayList.sort(comparator);
+
         LOGGER.info("Returning {} account data for {}", accountDataArrayList.size(), owner);
         return accountDataArrayList;
     }
@@ -128,9 +132,9 @@ public class SQLite {
     }
 
     private static boolean accountDataExists(String accountId) {
-        String checkSQL = "SELECT COUNT(*) FROM account_data WHERE id = ?";
+        String SQL = "SELECT COUNT(*) FROM account_data WHERE id = ?";
 
-        try (PreparedStatement checkStatement = con.prepareStatement(checkSQL)) {
+        try (PreparedStatement checkStatement = con.prepareStatement(SQL)) {
             checkStatement.setString(1, accountId);
             try (ResultSet resultSet = checkStatement.executeQuery()) {
                 return resultSet.next() && resultSet.getInt(1) > 0;
@@ -141,11 +145,25 @@ public class SQLite {
         return false;
     }
 
-    public static void saveBadges(String owner, String badges) {
+    public static void saveBadges(String owner, Badge... badges) {
         String SQL = badgesExist(owner) ? "REPLACE INTO badges (owner, badges) VALUES (?, ?)" : "INSERT INTO badges (owner, badges) VALUES (?, ?)";
+
         try (PreparedStatement updateStatement = con.prepareStatement(SQL)) {
             updateStatement.setString(1, owner);
-            updateStatement.setString(2, badges);
+            updateStatement.setString(2, Arrays.stream(badges).map(Enum::name).collect(Collectors.joining(",")));
+            updateStatement.executeUpdate();
+            LOGGER.info("Saved badges for {}", owner);
+        } catch (SQLException e) {
+            LOGGER.error("Failed to save badges", e);
+        }
+    }
+
+    public static void saveBadges(String owner, ArrayList<Badge> badgeList) {
+        String SQL = badgesExist(owner) ? "REPLACE INTO badges (owner, badges) VALUES (?, ?)" : "INSERT INTO badges (owner, badges) VALUES (?, ?)";
+
+        try (PreparedStatement updateStatement = con.prepareStatement(SQL)) {
+            updateStatement.setString(1, owner);
+            updateStatement.setString(2, badgeList.stream().map(Enum::name).collect(Collectors.joining(",")));
             updateStatement.executeUpdate();
             LOGGER.info("Saved badges for {}", owner);
         } catch (SQLException e) {
@@ -154,9 +172,9 @@ public class SQLite {
     }
 
     private static boolean badgesExist(String owner) {
-        String checkSQL = "SELECT COUNT(*) FROM badges WHERE owner = ?";
+        String SQL = "SELECT COUNT(*) FROM badges WHERE owner = ?";
 
-        try (PreparedStatement checkStatement = con.prepareStatement(checkSQL)) {
+        try (PreparedStatement checkStatement = con.prepareStatement(SQL)) {
             checkStatement.setString(1, owner);
             try (ResultSet resultSet = checkStatement.executeQuery()) {
                 return resultSet.next() && resultSet.getInt(1) > 0;
@@ -168,16 +186,20 @@ public class SQLite {
     }
 
     public static ArrayList<Badge> getBadges(String owner) {
-        String SQL = "SELECT * FROM badges WHERE owner = ?";
+        String SQL = "SELECT badges FROM badges WHERE owner = ?";
         ArrayList<Badge> badges = new ArrayList<>();
-        try (PreparedStatement preparedStatement = con.prepareStatement(SQL)) {
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(SQL);) {
             preparedStatement.setString(1, owner);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String badgesString = resultSet.getString("badges").toUpperCase();
-                    LOGGER.info("Returning badges {} for {}", badgesString, owner);
-                    for (String badge : badgesString.split(",")) {
-                        badges.add(Badge.valueOf(badge));
+                    if(!badgesString.isBlank()) {
+                        String[] badgeStrings = badgesString.split(",");
+                        for (String badge : badgeStrings) {
+                            badges.add(Badge.valueOf(badge));
+                        }
+                        LOGGER.info("Returning {} {} for {}", badgeStrings.length, badgeStrings.length > 1 ? "badges" : "badge", owner);
                     }
                 }
             }

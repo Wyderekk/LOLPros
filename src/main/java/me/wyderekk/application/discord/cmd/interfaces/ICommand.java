@@ -1,6 +1,7 @@
 package me.wyderekk.application.discord.cmd.interfaces;
 
 import me.wyderekk.application.discord.cmd.CommandEvent;
+import net.dv8tion.jda.api.Permission;
 
 public interface ICommand {
 
@@ -12,6 +13,11 @@ public interface ICommand {
 
     default String getCommandDescription() {
         return getClass().getAnnotation(Command.class).description();
+    }
+
+    default Permission[] getCommandPermissions() {
+        return getClass().getAnnotation(Command.class).permissions();
+
     }
 
     default int getMinArgs() {
