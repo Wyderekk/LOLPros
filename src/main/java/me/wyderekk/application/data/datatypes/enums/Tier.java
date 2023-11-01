@@ -4,17 +4,17 @@ import java.util.Arrays;
 
 public enum Tier {
 
-    CHALLENGER("Challenger"),
-    GRANDMASTER("Grandmaster"),
-    MASTER("Master"),
-    DIAMOND("Diamond"),
-    EMERALD("Emerald"),
-    PLATINUM("Platinum"),
-    GOLD("Gold"),
-    SILVER("Silver"),
-    BRONZE("Bronze"),
+    UNRANKED("Unranked"),
     IRON("Iron"),
-    UNRANKED("Unranked");
+    BRONZE("Bronze"),
+    SILVER("Silver"),
+    GOLD("Gold"),
+    PLATINUM("Platinum"),
+    EMERALD("Emerald"),
+    DIAMOND("Diamond"),
+    MASTER("Master"),
+    GRANDMASTER("Grandmaster"),
+    CHALLENGER("Challenger");
 
     private final String name;
 

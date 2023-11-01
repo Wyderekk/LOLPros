@@ -1,4 +1,4 @@
-package me.wyderekk.application.data.datatypes.comparator;
+package me.wyderekk.application.data.datatypes.comparators;
 
 import me.wyderekk.application.data.datatypes.AccountData;
 import me.wyderekk.application.data.datatypes.enums.SortBy;
@@ -18,7 +18,7 @@ public class AccountDataComparator {
 
     private static Comparator<AccountData> sortByCurrentRank() {
         return (o1, o2) -> {
-            int tierComparison = Integer.compare(o1.rank().tier().ordinal(), o2.rank().tier().ordinal());
+            int tierComparison = Integer.compare(o2.rank().tier().ordinal(), o1.rank().tier().ordinal());
             if (tierComparison != 0) {
                 return tierComparison;
             }
@@ -32,7 +32,7 @@ public class AccountDataComparator {
 
     private static Comparator<AccountData> sortByPeak() {
         return (o1, o2) -> {
-            int tierComparison = Integer.compare(o1.peak().tier().ordinal(), o2.peak().tier().ordinal());
+            int tierComparison = Integer.compare(o2.peak().tier().ordinal(), o1.peak().tier().ordinal());
             if (tierComparison != 0) {
                 return tierComparison;
             }

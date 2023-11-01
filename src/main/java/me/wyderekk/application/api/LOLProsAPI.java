@@ -1,4 +1,4 @@
-package me.wyderekk.application.api.lolpros;
+package me.wyderekk.application.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +7,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import me.wyderekk.application.data.datatypes.AccountData;
-import me.wyderekk.application.data.datatypes.Peak;
 import me.wyderekk.application.data.datatypes.Rank;
 import me.wyderekk.application.data.datatypes.SummonerName;
 import me.wyderekk.application.data.datatypes.enums.Division;
@@ -15,16 +14,17 @@ import me.wyderekk.application.data.datatypes.enums.Position;
 import me.wyderekk.application.data.datatypes.enums.Tier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-public class APIWrapper {
+public class LOLProsAPI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(APIWrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LOLProsAPI.class);
+    private static final OkHttpClient client = new OkHttpClient();
+    private static final String LOLPROS_API_URL = "https://api.lolpros.gg/es/profiles/";
 
-    public static String getPlayer(String name, OkHttpClient client) {
-        String url = "https://api.lolpros.gg/es/profiles/" + name;
+    public static String getPlayer(String name) {
+        String url = LOLPROS_API_URL + name;
 
         Request request = new Request.Builder()
                 .url(url)
@@ -40,7 +40,6 @@ public class APIWrapper {
                 return responseBodyString;
             } else {
                 LOGGER.error("[ {} ] Request failed with HTTP error code: {}", name, response.code());
-
             }
         } catch (Exception e) {
             LOGGER.error("[ {} ] Request failed with exception: {}", name, e.getMessage());
@@ -77,29 +76,11 @@ public class APIWrapper {
 
                 JsonNode rankNode = accountsNode.path(i).path("rank");
 
-                Rank rank = new Rank(
-                        Tier.getByName(rankNode.path("tier").asText()),
-                        Division.getByValue(rankNode.path("division").asInt()),
-                        rankNode.path("league_points").asInt(),
-                        rankNode.path("wins").asInt(),
-                        rankNode.path("losses").asInt(),
-                        rankNode.path("wins").asInt() != 0 && rankNode.path("losses").asInt() != 0 ?
-                                (double) rankNode.path("wins").asInt() / (rankNode.path("wins").asInt() + rankNode.path("losses").asInt()) : 0,
-                        ZonedDateTime.parse(rankNode.path("created_at").asText()).toEpochSecond()
-                );
+                Rank rank = getRank(rankNode);
 
                 JsonNode peakNode = accountsNode.path(i).path("peak");
 
-                Peak peak = new Peak(
-                        Tier.getByName(peakNode.path("tier").asText()),
-                        Division.getByValue(peakNode.path("division").asInt()),
-                        peakNode.path("league_points").asInt(),
-                        peakNode.path("wins").asInt(),
-                        peakNode.path("losses").asInt(),
-                        rankNode.path("wins").asInt() != 0 && rankNode.path("losses").asInt() != 0 ?
-                                (double) rankNode.path("wins").asInt() / (rankNode.path("wins").asInt() + rankNode.path("losses").asInt()) : 0,
-                        ZonedDateTime.parse(peakNode.path("created_at").asText()).toEpochSecond()
-                );
+                Rank peak = getRank(peakNode);
 
                 AccountData accountData = new AccountData(owner, id, summonerNameArrayList, position, avatarId, rank, peak);
                 accountDataArrayList.add(accountData);
@@ -110,4 +91,18 @@ public class APIWrapper {
         }
         return accountDataArrayList;
     }
+
+    private static Rank getRank(JsonNode rankNode) {
+        return new Rank(
+                Tier.getByName(rankNode.path("tier").asText()),
+                Division.getByValue(rankNode.path("division").asInt()),
+                rankNode.path("league_points").asInt(),
+                rankNode.path("wins").asInt(),
+                rankNode.path("losses").asInt(),
+                rankNode.path("wins").asInt() != 0 && rankNode.path("losses").asInt() != 0 ?
+                        (double) rankNode.path("wins").asInt() / (rankNode.path("wins").asInt() + rankNode.path("losses").asInt()) : 0,
+                ZonedDateTime.parse(rankNode.path("created_at").asText()).toEpochSecond()
+        );
+    }
+
 }

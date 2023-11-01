@@ -1,19 +1,17 @@
 package me.wyderekk.application.data;
 
-import me.wyderekk.application.data.database.SQLite;
-import me.wyderekk.application.data.datatypes.enums.Badge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class PlayerList {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerList.class);
     public static final PlayerList INSTANCE = new PlayerList();
     private final ArrayList<String> players = new ArrayList<>();
+    private final ArrayList<String> playersWithoutLOLPros = new ArrayList<>();
 
     private PlayerList() {
         addPlayers();
@@ -21,12 +19,19 @@ public class PlayerList {
 
     private void addPlayers() {
         ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("META-INF/resources/frontend/playerlist.txt");
+        InputStream inputStream = classLoader.getResourceAsStream("META-INF/resources/frontend/lolpros.txt");
+        readDataFromInputStream(inputStream, players);
+
+        inputStream = classLoader.getResourceAsStream("META-INF/resources/frontend/riotapi.txt");
+        readDataFromInputStream(inputStream, playersWithoutLOLPros);
+    }
+
+    private void readDataFromInputStream(InputStream inputStream, ArrayList<String> arrayList) {
         if (inputStream != null) {
             try (Scanner sc = new Scanner(inputStream)) {
                 while (sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    players.add(line);
+                    arrayList.add(line);
                     LOGGER.info("Added {} to player list", line);
                 }
             }
@@ -37,5 +42,9 @@ public class PlayerList {
 
     public ArrayList<String> getPlayers() {
         return players;
+    }
+
+    public ArrayList<String> getPlayersWithoutLOLPros() {
+        return playersWithoutLOLPros;
     }
 }

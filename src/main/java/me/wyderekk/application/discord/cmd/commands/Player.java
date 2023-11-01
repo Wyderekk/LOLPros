@@ -2,6 +2,7 @@ package me.wyderekk.application.discord.cmd.commands;
 
 import me.wyderekk.application.data.database.SQLite;
 import me.wyderekk.application.data.datatypes.AccountData;
+import me.wyderekk.application.data.util.AccountDataUtil;
 import me.wyderekk.application.discord.cmd.CommandEvent;
 import me.wyderekk.application.discord.cmd.interfaces.Command;
 import me.wyderekk.application.discord.cmd.interfaces.ICommand;
@@ -28,10 +29,11 @@ public class Player implements ICommand {
                 event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             } else {
                 AccountData highestAccount = accountData.getFirst();
+                embedBuilder.setThumbnail("https://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/" + highestAccount.avatarId() + ".png");
                 embedBuilder.setTitle(accountData.getFirst().owner());
-                embedBuilder.addField("Position: ", highestAccount.position().toString(), false);
-                embedBuilder.addField("Rank: ", String.format("%s %s %sLP", highestAccount.rank().tier().getName(), highestAccount.rank().division().name(), highestAccount.rank().lp()), false);
-                embedBuilder.addField("Peak: ", String.format("%s %s %sLP", highestAccount.peak().tier().getName(), highestAccount.peak().division().name(), highestAccount.peak().lp()), false);
+                embedBuilder.addField("Position: ", highestAccount.position().getName(), false);
+                embedBuilder.addField("Rank: ", AccountDataUtil.parse(highestAccount.rank().tier(), highestAccount.rank().division(), highestAccount.rank().lp()), false);
+                embedBuilder.addField("Peak: ", AccountDataUtil.parse(highestAccount.peak().tier(), highestAccount.peak().division(), highestAccount.peak().lp()), false);
                 embedBuilder.addField("Accounts: (" + accountData.size() + ")",
                         accountData.stream()
                                 .map(account -> account.summonerNames().getFirst().name())
