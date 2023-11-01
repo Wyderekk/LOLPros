@@ -36,5 +36,5 @@ To prepare a production build, use the following Maven command:
 This project is open-sourced under the UNLICENSE License. See the LICENSE file for full license text.
 
 # Acknowledgments
-Vaadin Framework - [Vaadin Framework](https://vaadin.com/)
-LOLPros - [LOLPros](https://lolpros.gg/)
+- Vaadin Framework - [Vaadin Framework](https://vaadin.com/)
+- LOLPros - [LOLPros](https://lolpros.gg/)
