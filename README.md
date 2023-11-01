@@ -22,9 +22,9 @@ To get the project running on your local machine for development and testing pur
 The application should now be running at `http://localhost:8080`.
 
 # Project Structure
-`src/main/java` - Contains the backend Java code including UI logic, views, and services.
-`src/main/resources` - Contains various resources such as templates and application properties.
-`frontend/` - Holds the frontend files, which can include HTML, CSS, JavaScript, or TypeScript.
+- `src/main/java` - Contains the backend Java code including UI logic, views, and services.
+- `src/main/resources` - Contains various resources such as templates and application properties.
+- `frontend/` - Holds the frontend files, which can include HTML, CSS, JavaScript, or TypeScript.
 # Building for Production
 To prepare a production build, use the following Maven command:
 
