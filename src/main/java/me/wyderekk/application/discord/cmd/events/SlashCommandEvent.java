@@ -69,4 +69,8 @@ public class SlashCommandEvent {
         return arguments;
     }
 
+    public SlashCommandInteractionEvent getSlashCommandInteractionEvent() {
+        return slashCommandInteractionEvent;
+    }
+
 }
