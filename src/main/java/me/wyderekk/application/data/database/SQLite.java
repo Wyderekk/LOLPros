@@ -146,7 +146,7 @@ public class SQLite {
         return null;
     }
 
-    public static AccountData getPeakAccountData(String accountId) {
+    public static void savePeakAccountData(String accountId) {
         String SQL = "SELECT COUNT(*) FROM " + RIOTAPI_DATA_TABLE_NAME + " WHERE id = ?";
 
         try (PreparedStatement preparedStatement = con.prepareStatement(SQL);
@@ -159,18 +159,23 @@ public class SQLite {
                 accountDataArrayList.add(AccountDataDao.fromJsonString(jsonData));
             }
 
+            // sort accounts by current rank
             Comparator<AccountData> comparator = AccountDataComparator.getComparator(SortBy.CURRENT_RANK);
             accountDataArrayList.sort(comparator);
 
+            // account with highest current rank
             Rank peak = accountDataArrayList.getFirst().rank();
 
             accountDataArrayList.sort(Comparator.comparingLong(o -> o.rank().createdAt()));
 
+            // account with most recent rank
             AccountData accountData = accountDataArrayList.getLast();
 
+            // clear all accounts with same owner
             clearTempData(accountData.owner());
 
-            AccountData returnAccountData = new AccountData(
+            // newest account data but with peak rank
+            AccountData accountDataWithPeak = new AccountData(
                     accountData.owner(),
                     accountData.id(),
                     accountData.summonerNames(),
@@ -181,12 +186,11 @@ public class SQLite {
             );
 
             saveAccountData(accountData, RIOTAPI_DATA_TABLE_NAME);
+            saveAccountData(accountDataWithPeak, LOLPROS_DATA_TABLE_NAME);
 
-            return returnAccountData;
         } catch (SQLException e) {
             LOGGER.error("Failed to get sorted account data", e);
         }
-        return null;
     }
 
 
@@ -269,8 +273,9 @@ public class SQLite {
     }
 
     private static void clearTempData(String owner) {
-        final String SQL_DELETE = "DELETE FROM " + RIOTAPI_DATA_TABLE_NAME + " WHERE json_extract(json_data, '$.owner') = ?";
-        try (PreparedStatement preparedStatement = con.prepareStatement(SQL_DELETE)) {
+        String SQL = "DELETE FROM " + RIOTAPI_DATA_TABLE_NAME + " WHERE json_extract(json_data, '$.owner') = ?";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(SQL)) {
             preparedStatement.setString(1, owner.toLowerCase());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

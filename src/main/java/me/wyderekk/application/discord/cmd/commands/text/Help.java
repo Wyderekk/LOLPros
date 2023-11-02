@@ -1,6 +1,6 @@
-package me.wyderekk.application.discord.cmd.commands;
+package me.wyderekk.application.discord.cmd.commands.text;
 
-import me.wyderekk.application.discord.cmd.CommandEvent;
+import me.wyderekk.application.discord.cmd.events.TextCommandEvent;
 import me.wyderekk.application.discord.cmd.CommandManager;
 import me.wyderekk.application.discord.cmd.interfaces.Command;
 import me.wyderekk.application.discord.cmd.interfaces.ICommand;
@@ -11,12 +11,14 @@ import java.awt.*;
 public class Help implements ICommand {
 
     @Override
-    public void executeCommand(CommandEvent event) {
+    public void executeTextCommand(TextCommandEvent event) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(new Color(125, 60, 255));
         embedBuilder.setTitle("Commands: ");
-        for (ICommand command :  CommandManager.INSTANCE.getCommands()) {
-            embedBuilder.addField(command.getCommandName(), command.getCommandDescription(), true);
+        for (ICommand command :  CommandManager.getInstance().getTextCommands()) {
+            if(!command.isHidden()) {
+                embedBuilder.addField(command.getCommandName(), command.getCommandDescription(), true);
+            }
         }
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
     }

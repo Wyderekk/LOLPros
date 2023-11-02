@@ -1,9 +1,9 @@
-package me.wyderekk.application.discord.cmd.commands;
+package me.wyderekk.application.discord.cmd.commands.text;
 
 import me.wyderekk.application.data.PlayerList;
 import me.wyderekk.application.data.database.SQLite;
 import me.wyderekk.application.data.datatypes.enums.Badge;
-import me.wyderekk.application.discord.cmd.CommandEvent;
+import me.wyderekk.application.discord.cmd.events.TextCommandEvent;
 import me.wyderekk.application.discord.cmd.interfaces.Command;
 import me.wyderekk.application.discord.cmd.interfaces.ICommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.Permission;
 import java.awt.*;
 import java.util.ArrayList;
 
-@Command(name = "badge", description = "Manage player badges.", permissions = Permission.ADMINISTRATOR, minArgs = 3, maxArgs = 3)
+@Command(name = "badge", description = "Manage player badges.", permissions = Permission.ADMINISTRATOR, minArgs = 3, maxArgs = 3, hidden = true)
 public class ManageBadge implements ICommand {
 
     @Override
-    public void executeCommand(CommandEvent event) {
+    public void executeTextCommand(TextCommandEvent event) {
         String[] args = event.getArguments();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(new Color(125, 60, 255));

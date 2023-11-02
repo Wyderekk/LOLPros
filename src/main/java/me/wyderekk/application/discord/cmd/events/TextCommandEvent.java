@@ -1,17 +1,15 @@
-package me.wyderekk.application.discord.cmd;
+package me.wyderekk.application.discord.cmd.events;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
 import java.util.Arrays;
 
-public class CommandEvent {
+public class TextCommandEvent {
 
     private JDA jda;
 
@@ -23,22 +21,22 @@ public class CommandEvent {
 
     private MessageChannelUnion channel;
 
-    private MessageReceivedEvent messageReceivedEvent;
-
     private String[] arguments;
+
+    private MessageReceivedEvent messageReceivedEvent;
 
     /**
      * Constructor used to save the Data.
      *
      * @param jda                          the {@link JDA} Entity.
-     * @param member                       the {@link Member} Entity.
+     * @param user                         the {@link User} Entity.
      * @param guild                        the {@link Guild} Entity.
      * @param message                      the {@link Message} Entity.
      * @param textChannel                  the {@link TextChannel} Entity.
-     * @param messageReceivedEvent         the {@link MessageReceivedEvent} Entity.
      * @param arguments                    the {@link String[]} Entity.
+     * @param messageReceivedEvent         the {@link MessageReceivedEvent} Entity.
      */
-    public CommandEvent(MessageReceivedEvent messageReceivedEvent) {
+    public TextCommandEvent(MessageReceivedEvent messageReceivedEvent) {
         this.messageReceivedEvent = messageReceivedEvent;
         this.jda = messageReceivedEvent.getJDA();
         this.user = messageReceivedEvent.getAuthor();

@@ -1,9 +1,9 @@
-package me.wyderekk.application.discord.cmd.commands;
+package me.wyderekk.application.discord.cmd.commands.text;
 
 import me.wyderekk.application.data.database.SQLite;
 import me.wyderekk.application.data.datatypes.AccountData;
 import me.wyderekk.application.data.util.AccountDataUtil;
-import me.wyderekk.application.discord.cmd.CommandEvent;
+import me.wyderekk.application.discord.cmd.events.TextCommandEvent;
 import me.wyderekk.application.discord.cmd.interfaces.Command;
 import me.wyderekk.application.discord.cmd.interfaces.ICommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class Player implements ICommand {
 
     @Override
-    public void executeCommand(CommandEvent event) {
+    public void executeTextCommand(TextCommandEvent event) {
         String[] args = event.getArguments();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(new Color(125, 60, 255));

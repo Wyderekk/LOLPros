@@ -13,8 +13,25 @@ public @interface Command {
 
     String name();
     String description();
+
+    /**
+     * Permissions which commands require to use
+     */
     Permission[] permissions() default {};
+
+    /**
+    Min arguments which text commands can have
+     */
     int minArgs() default 0;
+
+    /**
+    Max arguments which text commands can have
+    */
     int maxArgs() default 0;
+
+    /**
+    Should command be hidden from the help command
+    */
+    boolean hidden() default false;
 
 }
