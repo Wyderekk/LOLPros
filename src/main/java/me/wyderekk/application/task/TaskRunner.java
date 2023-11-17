@@ -7,8 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskRunner {
 
+    private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     public static void runInBackground(int initialDelay, int interval, TimeUnit timeUnit, Runnable... runnable) {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         Arrays.stream(runnable).forEach(r -> scheduler.scheduleAtFixedRate(r, initialDelay, interval, timeUnit));
     }
 }

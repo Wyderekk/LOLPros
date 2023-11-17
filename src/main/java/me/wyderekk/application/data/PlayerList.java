@@ -19,6 +19,7 @@ public class PlayerList {
 
     private void addPlayers() {
         ClassLoader classLoader = getClass().getClassLoader();
+
         InputStream inputStream = classLoader.getResourceAsStream("META-INF/resources/frontend/lolpros.txt");
         readDataFromInputStream(inputStream, players);
 

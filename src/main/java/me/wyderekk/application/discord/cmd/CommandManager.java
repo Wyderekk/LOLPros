@@ -48,7 +48,7 @@ public class CommandManager {
                 try {
                     ICommand commandInstance = clazz.getDeclaredConstructor().newInstance();
                     commandList.add(commandInstance);
-                    LOGGER.info("Successfully loaded Command {}", clazz.getSimpleName());
+                    LOGGER.info("Successfully loaded command {}", clazz.getSimpleName());
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     LOGGER.error("Failed to instantiate command {}", clazz.getSimpleName(), e);
                 }

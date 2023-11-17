@@ -30,7 +30,7 @@ public class RiotAPI {
     public static AccountData getAccountData(String owner, String query, boolean usePuuid) {
         Summoner summoner = usePuuid ? Orianna.summonerWithPuuid(query).get() : Orianna.summonerNamed(query).get();
         LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-
+        long currentTimestamp = Instant.now().getEpochSecond();
         Rank rank = new Rank(
                 Tier.valueOf(leagueEntry.getTier().name()),
                 Division.valueOf(leagueEntry.getDivision().name()),
@@ -38,7 +38,7 @@ public class RiotAPI {
                 leagueEntry.getWins(),
                 leagueEntry.getLosses(),
                 leagueEntry.getWins() + leagueEntry.getLosses(),
-                Instant.now().getEpochSecond());
+                currentTimestamp);
 
         String summonerName = usePuuid ? summoner.getName() : query;
 
@@ -46,7 +46,8 @@ public class RiotAPI {
         return new AccountData(
                 owner,
                 summoner.getPuuid(),
-                new ArrayList<>(List.of(new SummonerName(summonerName, summoner.getUpdated().getMillis()))),
+                // idk what returns summoner.getUpdated()
+                new ArrayList<>(List.of(new SummonerName(summonerName, currentTimestamp))),
                 getMostPlayedRole(summoner),
                 summoner.getProfileIcon().getId(),
                 rank,

@@ -8,6 +8,7 @@ import me.wyderekk.application.data.datatypes.enums.Badge;
 import me.wyderekk.application.data.datatypes.enums.SortBy;
 import me.wyderekk.application.task.TaskRunner;
 import me.wyderekk.application.task.tasks.UpdateLOLProsData;
+import me.wyderekk.application.task.tasks.UpdateRiotAPIData;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,8 @@ public class SQLite {
             Class.forName("org.sqlite.JDBC");
             con = DriverManager.getConnection(URL);
             createTable();
-            TaskRunner.runInBackground(1, 3, TimeUnit.HOURS, new UpdateLOLProsData(), new UpdateLOLProsData());
+            TaskRunner.runInBackground(1, 3, TimeUnit.HOURS, new UpdateLOLProsData());
+            TaskRunner.runInBackground(1,24, TimeUnit.HOURS, new UpdateRiotAPIData());
             hookDisconnect();
             LOGGER.info("Connected to database");
         } catch (Exception e) {
@@ -78,7 +80,6 @@ public class SQLite {
                     json_data TEXT
                 );
                 """.formatted(RIOTAPI_DATA_TABLE_NAME);
-
         try (Statement stmt = con.createStatement()) {
             stmt.execute(SQL1);
             stmt.execute(SQL2);

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Command(name = "player", description = "Displays player information.", minArgs = 1, maxArgs = 1)
+@Command(name = "player", description = "Displays player information.")
 public class Player implements ICommand {
 
     @Override

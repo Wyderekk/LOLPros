@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 
 @RestController
@@ -26,7 +25,6 @@ public class AccountDataController {
                 String jsonData = objectMapper.writeValueAsString(accountData);
                 return ResponseEntity.ok(jsonData);
             } catch (Exception e) {
-                e.printStackTrace();
                 return ResponseEntity.status(500).body("Internal Server Error");
             }
         } else {
