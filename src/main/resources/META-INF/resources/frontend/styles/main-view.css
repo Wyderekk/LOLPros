@@ -70,7 +70,7 @@
 }
 
 .leaderboard-summoner-rank img {
-    height: 29.8px;
+    height: 30px;
     width: 32px;
     user-select: none;
     overflow: clip;
@@ -80,7 +80,7 @@
 .leaderboard-summoner-rank span {
     font-size: 10px;
     position: absolute;
-    margin-top: 2%;
+    margin-top: 4vh;
     user-select: none;
 }
 
@@ -128,9 +128,5 @@
 
     .header-card {
         width: 90%;
-    }
-
-    .leaderboard-summoner-rank span {
-        margin-top: 8%;
     }
 }
