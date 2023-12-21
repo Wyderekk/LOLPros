@@ -1,5 +1,6 @@
 package me.wyderekk.application.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
@@ -11,6 +12,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 import me.wyderekk.application.data.database.SQLite;
 import me.wyderekk.application.data.datatypes.AccountData;
+import me.wyderekk.application.data.datatypes.Rank;
 import me.wyderekk.application.data.datatypes.SummonerName;
 import me.wyderekk.application.data.datatypes.enums.Badge;
 import me.wyderekk.application.data.datatypes.enums.SortBy;
@@ -32,69 +34,88 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<String> {
 
     private static final String LOL_CDN = "https://ddragon.leagueoflegends.com/cdn/13.21.1/img/profileicon/";
+    private static final String RANK_CARD_CLASS = "rank-card";
+    private static final String BOLD_CLASS = "bold";
+    private static final String INFO_CLASS = "info";
 
     @Override
     public void setParameter(BeforeEvent event, @WildcardParameter String parameter) {
         String decodedParameter = URLDecoder.decode(parameter, StandardCharsets.UTF_8);
-        ArrayList<AccountData> accountDataArrayList = SQLite.getAccountData(decodedParameter);
+        List<AccountData> dataArrayList = SQLite.getAccountData(decodedParameter);
+        AccountData firstAccount = dataArrayList.getFirst();
 
         // profile card
 
+        Div profileContainer = createProfileContainer(firstAccount);
+
+        // info
+
+        Div infoContainer = new Div();
+        infoContainer.setClassName("info-container");
+
+        HorizontalLayout accountsContainer = new HorizontalLayout();
+        accountsContainer.setClassName("accounts-container");
+
+        AtomicInteger selectedAccount = new AtomicInteger(0);
+        AccountData accountData = dataArrayList.get(selectedAccount.get());
+
+        VerticalLayout accountInfoLayout = new VerticalLayout();
+        accountInfoLayout.setClassName("account-info-layout");
+
+        // rank cards
+
+        H4 currentRankText = new H4("Current Rank");
+        currentRankText.setId("heading");
+
+        Div currentRank = new Div();
+        currentRank.setClassName("rank-card");
+        createRankCard(currentRank, accountData, false);
+
+        H4 peakRankText = new H4("Peak Rank");
+        peakRankText.setId("heading");
+
+        Div peakRank = new Div();
+        peakRank.setClassName("rank-card");
+        createRankCard(peakRank, accountData, true);
+
+        H4 lastSummonerNamesText = new H4("Last Summoner Names");
+        lastSummonerNamesText.setId("heading");
+
+        // last summonerNames
+
+        VirtualList<SummonerName> summonerNameHistory = createSummonerNamesList(accountData, dataArrayList, accountsContainer, selectedAccount, currentRank, peakRank);
+
+        accountInfoLayout.add(currentRankText, currentRank, peakRankText, peakRank, lastSummonerNamesText, summonerNameHistory);
+
+        infoContainer.add(accountsContainer, accountInfoLayout);
+
+        profileContainer.add(infoContainer);
+
+        add(profileContainer);
+    }
+
+    private Div createProfileContainer(AccountData firstAccount) {
         Div profileContainer = new Div();
         profileContainer.setClassName("profile-container");
 
+        VerticalLayout profileLayout = createLayout();
+        profileContainer.add(profileLayout);
+
+        Div cardProfile = createCardProfile(firstAccount);
+        Div rankingsCard = createRankingsCard(firstAccount);
+
+        profileLayout.add(cardProfile, rankingsCard);
+
+        return profileContainer;
+    }
+    private VerticalLayout createLayout() {
         VerticalLayout profileLayout = new VerticalLayout();
         profileLayout.setWidth("auto");
         profileLayout.setClassName("profile-layout");
+        return profileLayout;
+    }
 
-        // main card
-        Div cardProfile = new Div();
-        cardProfile.setClassName("card-profile");
-
-        VerticalLayout cardProfileLayout = new VerticalLayout();
-        cardProfileLayout.setClassName("card-profile-layout");
-
-        AccountData firstAccount = accountDataArrayList.getFirst();
-
-        Avatar profileCardImage = new Avatar("Profile Picture", LOL_CDN + firstAccount.avatarId() + ".png");
-        profileCardImage.setClassName("profile-card-avatar");
-
-        H1 profileCardName = new H1(firstAccount.owner());
-
-        Div badges = new Div();
-        badges.setClassName("badges");
-
-        ArrayList<Badge> userBadges = SQLite.getBadges(firstAccount.owner().toLowerCase());
-
-        if(!userBadges.isEmpty()) {
-            userBadges.forEach(badge -> {
-
-                Image badgeImage = new Image("frontend/img/badges/" + badge.name().toLowerCase() + ".svg", badge.name());
-                badgeImage.setClassName("badge");
-
-                Tooltip tooltip = Tooltip.forComponent(badgeImage);
-                tooltip.setText(badge.name().substring(0, 1).toUpperCase() + badge.name().substring(1).toLowerCase());
-                tooltip.setPosition(Tooltip.TooltipPosition.TOP);
-
-                badges.add(badgeImage);
-            });
-        }
-
-        Div roleKeypoint = new Div();
-        roleKeypoint.setClassName("role-keypoint");
-
-        Image roleImage = new Image("frontend/roles/" + firstAccount.position().getName().toLowerCase() + ".svg", firstAccount.position().getName());
-        roleImage.setClassName("profile-role-image");
-
-        Span roleText = new Span();
-        roleText.setText(firstAccount.position().getName());
-
-        roleKeypoint.add(roleImage, roleText);
-        cardProfileLayout.add(profileCardImage, profileCardName, badges, roleKeypoint);
-        cardProfile.add(cardProfileLayout);
-
-        // rankings card
-
+    private Div createRankingsCard(AccountData firstAccount) {
         Div rankingsCard = new Div();
         rankingsCard.setClassName("rankings-card");
 
@@ -128,12 +149,12 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         Span positionRankingNumber = new Span();
         positionRankingNumber.setId("bold");
 
-        // gets all accounts with the same position as the first account
+        // Get all accounts with the same position as the first account
         List<AccountData> positionList = SQLite.getSortedAccountData(SortBy.CURRENT_RANK).stream()
                 .filter(accountData -> accountData.position().equals(firstAccount.position()))
                 .toList();
 
-        // gets the position of the first account in the list
+        // Get ranking position of the first account in the list
         positionList.stream()
                 .filter(accountData -> accountData.owner().equals(firstAccount.owner()))
                 .findFirst()
@@ -144,41 +165,10 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
         rankingsCardLayout.add(globalRanking, positionRanking);
         rankingsCard.add(rankingsCardLayout);
 
-        profileLayout.add(cardProfile, rankingsCard);
+        return rankingsCard;
+    }
 
-        // info
-
-        Div infoContainer = new Div();
-        infoContainer.setClassName("info-container");
-
-        HorizontalLayout accountsContainer = new HorizontalLayout();
-        accountsContainer.setClassName("accounts-container");
-
-        AtomicInteger selectedAccount = new AtomicInteger(0);
-        AccountData accountData = accountDataArrayList.get(selectedAccount.get());
-
-        VerticalLayout accountInfoLayout = new VerticalLayout();
-        accountInfoLayout.setClassName("account-info-layout");
-
-        // rank cards
-
-        H4 currentRankText = new H4("Current Rank");
-        currentRankText.setId("heading");
-
-        Div currentRank = new Div();
-        currentRank.setClassName("rank-card");
-        createRankCard(currentRank, accountData);
-
-        H4 peakRankText = new H4("Peak Rank");
-        peakRankText.setId("heading");
-
-        Div peakRank = new Div();
-        peakRank.setClassName("rank-card");
-        createPeakCard(peakRank, accountData);
-
-        H4 lastSummonerNamesText = new H4("Last Summoner Names");
-        lastSummonerNamesText.setId("heading");
-
+    private VirtualList<SummonerName> createSummonerNamesList(AccountData accountData, List<AccountData> dataArrayList, HorizontalLayout accountsContainer, AtomicInteger selectedAccount, Div currentRank, Div peakRank) {
         VirtualList<SummonerName> lastSummonerNames = new VirtualList<>();
         lastSummonerNames.setClassName("last-summoner-names");
         lastSummonerNames.setItems(accountData.summonerNames());
@@ -198,13 +188,12 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
             return summonerNameCard;
         }));
 
-        accountDataArrayList.forEach(profile -> {
+        dataArrayList.forEach(profile -> {
             Div div = new Div();
             div.setText(profile.summonerNames().getFirst().name());
             div.setClassName("account");
             div.getElement().setAttribute("data-selected", "false");
             div.addClickListener(e -> {
-                // unselects all accounts then selects the clicked one
                 accountsContainer.getChildren().forEach(child -> {
                     if (child instanceof Div childDiv) {
                         childDiv.getElement().setAttribute("data-selected", "false");
@@ -214,20 +203,20 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
                 div.getElement().setAttribute("data-selected", "true");
                 div.addClassName("selected");
 
-                selectedAccount.set(accountDataArrayList.indexOf(profile));
+                selectedAccount.set(dataArrayList.indexOf(profile));
 
-                // updates rank cards and last summoner names
+                // Update each rank card with the new data
                 currentRank.removeAll();
-                createRankCard(currentRank, accountDataArrayList.get(selectedAccount.get()));
+                createRankCard(currentRank, dataArrayList.get(selectedAccount.get()), false);
 
                 peakRank.removeAll();
-                createPeakCard(peakRank, accountDataArrayList.get(selectedAccount.get()));
+                createRankCard(peakRank, dataArrayList.get(selectedAccount.get()), true);
 
-                lastSummonerNames.setItems(accountDataArrayList.get(selectedAccount.get()).summonerNames());
+                lastSummonerNames.setItems(dataArrayList.get(selectedAccount.get()).summonerNames());
             });
 
             // selects first account by default
-            if(accountDataArrayList.indexOf(profile) == 0) {
+            if(dataArrayList.indexOf(profile) == 0) {
                 div.getElement().setAttribute("data-selected", "true");
                 div.addClassName("selected");
             }
@@ -235,63 +224,107 @@ public class PlayerInfoView extends HorizontalLayout implements HasUrlParameter<
             accountsContainer.add(div);
         });
 
-        accountInfoLayout.add(currentRankText, currentRank, peakRankText, peakRank, lastSummonerNamesText, lastSummonerNames);
-
-        infoContainer.add(accountsContainer, accountInfoLayout);
-
-        profileContainer.add(profileLayout, infoContainer);
-
-        add(profileContainer);
+        return lastSummonerNames;
     }
 
-    public void createRankCard(Div div, AccountData accountData) {
 
-        Div background = new Div();
-        background.setClassName("background");
-        background.getStyle().setBackground("url(frontend/img/" + accountData.rank().tier().getName().toLowerCase() + ".webp) center/cover no-repeat");
+    private Div createBadgesDiv(AccountData firstAccount) {
+        Div badges = new Div();
+        badges.setClassName("badges");
 
-        Div info = new Div();
-        info.setClassName("info");
+        ArrayList<Badge> userBadges = SQLite.getBadges(firstAccount.owner().toLowerCase());
 
-        String tier = accountData.rank().tier().getName().equals("Unranked") ? accountData.rank().tier().getName() : accountData.rank().tier().getName() + " " + accountData.rank().division().ordinal();
-        Paragraph currentTier = new Paragraph(tier);
-        currentTier.setId("bold");
-        Paragraph currentLP = new Paragraph(accountData.rank().lp() + " LP");
-        currentLP.setId("bold");
-        Paragraph currentWinrate = new Paragraph(accountData.rank().wins() + "/" + accountData.rank().loses() + " (" + AccountDataUtil.getRoundedWinrateAsInt(accountData.rank().winrate()) + "%)");
-        Paragraph currentCreatedAt = new Paragraph(Instant.ofEpochSecond(accountData.rank().createdAt())
-                .atZone(ZoneId.of("UTC"))
-                .format(DateTimeFormatter.ofPattern("d/M")));
-        currentCreatedAt.setId("time");
+        if(!userBadges.isEmpty()) {
+            userBadges.forEach(badge -> {
 
-        info.add(currentTier, currentLP, currentWinrate, currentCreatedAt);
+                Image badgeImage = new Image("frontend/img/badges/" + badge.name().toLowerCase() + ".svg", badge.name());
+                badgeImage.setClassName("badge");
 
-        div.add(background, info);
+                Tooltip tooltip = Tooltip.forComponent(badgeImage);
+                tooltip.setText(badge.name().substring(0, 1).toUpperCase() + badge.name().substring(1).toLowerCase());
+                tooltip.setPosition(Tooltip.TooltipPosition.TOP);
+
+                badges.add(badgeImage);
+            });
+        }
+
+        return badges;
     }
 
-    public void createPeakCard(Div div, AccountData accountData) {
+    private Div createCardProfile(AccountData firstAccount) {
+        Div cardProfile = new Div();
+        cardProfile.setClassName("card-profile");
 
+        VerticalLayout cardProfileLayout = new VerticalLayout();
+        cardProfileLayout.setClassName("card-profile-layout");
+
+        Avatar profileCardImage = new Avatar("Profile Picture", LOL_CDN + firstAccount.avatarId() + ".png");
+        profileCardImage.setClassName("profile-card-avatar");
+
+        H1 profileCardName = new H1(firstAccount.owner());
+
+        Div badges = createBadgesDiv(firstAccount);
+
+        Div roleKeypoint = new Div();
+        roleKeypoint.setClassName("role-keypoint");
+
+        Image roleImage = new Image("frontend/roles/" + firstAccount.position().getName().toLowerCase() + ".svg", firstAccount.position().getName());
+        roleImage.setClassName("profile-role-image");
+
+        Span roleText = new Span();
+        roleText.setText(firstAccount.position().getName());
+
+        roleKeypoint.add(roleImage, roleText);
+        cardProfileLayout.add(profileCardImage, profileCardName, badges, roleKeypoint);
+        cardProfile.add(cardProfileLayout);
+
+        return cardProfile;
+    }
+
+
+    private void createRankCard(Div div, AccountData accountData, boolean isPeak) {
+        Rank rank = isPeak ? accountData.peak() : accountData.rank();
+
+        div.setClassName(RANK_CARD_CLASS);
+        div.add(createBackgroundDiv(rank.tier().getName().toLowerCase()));
+        div.add(createRankInfoDiv(rank));
+    }
+
+    private Div createBackgroundDiv(String tierName) {
         Div background = new Div();
         background.setClassName("background");
-        background.getStyle().setBackground("url(frontend/img/" + accountData.peak().tier().getName().toLowerCase() + ".webp) center/cover no-repeat");
+        background.getStyle().setBackground("url(frontend/img/" + tierName + ".webp) center/cover no-repeat");
+        return background;
+    }
 
+    private Div createRankInfoDiv(Rank rank) {
         Div info = new Div();
-        info.setClassName("info");
+        info.setClassName(INFO_CLASS);
 
-        String tier = accountData.peak().tier().getName().equals("Unranked") ? accountData.peak().tier().getName() : accountData.peak().tier().getName() + " " + accountData.peak().division().ordinal();
-        Paragraph peakTier = new Paragraph(tier);
-        peakTier.setId("bold");
-        Paragraph peakLP = new Paragraph(accountData.peak().lp() + " LP");
-        peakLP.setId("bold");
-        Paragraph peakWinrate = new Paragraph(accountData.peak().wins() + "/" + accountData.peak().loses() + " (" + AccountDataUtil.getRoundedWinrateAsInt(accountData.peak().winrate()) + "%)");
-        Paragraph peakCreatedAt = new Paragraph(Instant.ofEpochSecond(accountData.peak().createdAt())
+        String tierText = rank.tier().getName().equals("Unranked")
+                ? rank.tier().getName()
+                : rank.tier().getName() + " " + rank.division().ordinal();
+
+        info.add(createBoldParagraph(tierText),
+                createBoldParagraph(rank.lp() + " LP"),
+                new Paragraph(rank.wins() + "/" + rank.loses() + " (" + AccountDataUtil.getRoundedWinrateAsInt(rank.winrate()) + "%)"),
+                createDateParagraph(rank.createdAt()));
+
+        return info;
+    }
+
+    private Paragraph createBoldParagraph(String text) {
+        Paragraph paragraph = new Paragraph(text);
+        paragraph.setId(BOLD_CLASS);
+        return paragraph;
+    }
+
+    private Paragraph createDateParagraph(long epochSecond) {
+        Paragraph paragraph = new Paragraph(Instant.ofEpochSecond(epochSecond)
                 .atZone(ZoneId.of("UTC"))
                 .format(DateTimeFormatter.ofPattern("d/M")));
-        peakCreatedAt.setId("time");
-
-        info.add(peakTier, peakLP, peakWinrate, peakCreatedAt);
-
-        div.add(background, info);
+        paragraph.setId("time");
+        return paragraph;
     }
 
 }

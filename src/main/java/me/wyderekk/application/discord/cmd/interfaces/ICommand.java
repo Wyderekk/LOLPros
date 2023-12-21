@@ -30,7 +30,6 @@ public interface ICommand {
 
     default Permission[] getCommandPermissions() {
         return getClass().getAnnotation(Command.class).permissions();
-
     }
 
     default int getMinArgs() {

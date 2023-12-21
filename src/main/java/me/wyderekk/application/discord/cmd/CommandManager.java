@@ -15,6 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CommandManager {
 
+
+    private static final CommandManager INSTANCE = new CommandManager();
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
     private final List<ICommand> textCommands = new CopyOnWriteArrayList<>();
     private final List<ICommand> slashCommands = new CopyOnWriteArrayList<>();
@@ -25,12 +27,8 @@ public class CommandManager {
         initializeCommands("me.wyderekk.application.discord.cmd.commands.slash", slashCommands);
     }
 
-    private static class Loader {
-        static final CommandManager INSTANCE = new CommandManager();
-    }
-
     public static CommandManager getInstance() {
-        return Loader.INSTANCE;
+        return INSTANCE;
     }
 
     private void initializeCommands(String packagePath, List<ICommand> commandList) {

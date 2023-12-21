@@ -29,17 +29,48 @@ import java.util.stream.Collectors;
 @CssImport("./styles/main-view.css")
 public class MainView extends VerticalLayout {
 
+    private static final int LEADERBOARD_LIMIT = 10;
+    private static final int SEARCH_DISTANCE_THRESHOLD = 2;
+
     public MainView() {
         initializeUI();
     }
 
     private void initializeUI() {
+        Div cardContainer = createCardContainer();
+        Div leaderboardCard = createLeaderboardCard();
+        Div searchCard = createSearchCard();
+        Div headerCard = createHeaderCard();
+
+        cardContainer.add(headerCard, searchCard, leaderboardCard);
+        add(cardContainer);
+
+        // Configure the main layout properties
+        setJustifyContentMode(JustifyContentMode.CENTER);
+        setAlignItems(Alignment.CENTER);
+    }
+
+    private Div createCardContainer() {
         Div cardContainer = new Div();
         cardContainer.addClassName("card-container");
+        return cardContainer;
+    }
 
+    private Div createLeaderboardCard() {
         Div leaderboardCard = new Div();
         leaderboardCard.addClassName("leaderboard-card");
 
+        // Get the top 10 players from the database and create a div for each
+        ArrayList<AccountData> leaderboard = SQLite.getSortedAccountData(SortBy.CURRENT_RANK);
+        leaderboard.stream()
+                .limit(LEADERBOARD_LIMIT)
+                .map(this::createSummonerDiv)
+                .forEach(leaderboardCard::add);
+
+        return leaderboardCard;
+    }
+
+    private Div createSearchCard() {
         Div searchCard = new Div();
         searchCard.addClassName("search-card");
 
@@ -47,37 +78,25 @@ public class MainView extends VerticalLayout {
         searchField.setPlaceholder("Username");
         searchField.setWidth("50%");
 
+        Button searchButton = new Button("Search");
+        searchButton.addClickListener(event -> searchForPlayer(searchField));
+        searchButton.addClickShortcut(Key.ENTER);
+
+        searchCard.add(searchField, searchButton);
+        return searchCard;
+    }
+
+    private Div createHeaderCard() {
         Div headerCard = new Div();
         headerCard.addClassName("header-card");
 
         H4 topText = new H4("Top 10");
-
+        // Clicking text will navigate to the complete ladder
         Html completeLadderText = new Html("<a href=\"/ladder\">Complete ladder</a>");
         completeLadderText.setClassName("header-complete-ladder");
 
-        Button search = new Button("Search");
-
-        search.addClickShortcut(Key.ENTER);
-        search.addClickListener(event -> searchForPlayer(searchField));
-
-        ArrayList<AccountData> leaderboard = SQLite.getSortedAccountData(SortBy.CURRENT_RANK);
-
-        ArrayList<Div> topSummoners = leaderboard.stream()
-                .limit(10)
-                .map(this::createSummonerDiv)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        searchCard.add(searchField, search);
         headerCard.add(topText, completeLadderText);
-
-        topSummoners.forEach(leaderboardCard::add);
-
-        cardContainer.add(headerCard, searchCard, leaderboardCard);
-
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setAlignItems(Alignment.CENTER);
-
-        add(cardContainer);
+        return headerCard;
     }
 
     private Div createSummonerDiv(AccountData accountData) {
@@ -85,6 +104,7 @@ public class MainView extends VerticalLayout {
         summoner.setClassName("leaderboard-summoner");
 
         Paragraph name = new Paragraph(accountData.owner());
+        // Clicking name will navigate to the player's profile
         name.addClickListener(event -> UI.getCurrent().navigate("/player/" + accountData.owner()));
 
         Div role = new Div();
@@ -119,11 +139,12 @@ public class MainView extends VerticalLayout {
             ArrayList<String> players = PlayerList.INSTANCE.getPlayers();
             String closestMatch = findClosestMatch(searchText, players);
 
-            if (closestMatch != null) {
+            // If closestMatch exists in the database, navigate to the player's profile
+            if(closestMatch == null) {
+                Notification.show("Player not found in database", 3000, Notification.Position.BOTTOM_START);
+            } else {
                 String encodedSearchText = URLEncoder.encode(closestMatch, StandardCharsets.UTF_8);
                 UI.getCurrent().navigate("/player/" + encodedSearchText);
-            } else {
-                Notification.show("Player not found in streamer database", 3000, Notification.Position.BOTTOM_START);
             }
         }
     }
@@ -132,6 +153,7 @@ public class MainView extends VerticalLayout {
         int minDistance = Integer.MAX_VALUE;
         String closestMatch = null;
 
+        // Find the player with the smallest Levenshtein distance to the search text
         for (String player : players) {
             int distance = LevenshteinDistance.getDistance(searchText, player);
             if (distance < minDistance) {
@@ -140,11 +162,6 @@ public class MainView extends VerticalLayout {
             }
         }
 
-        int threshold = 2;
-        if (minDistance <= threshold) {
-            return closestMatch;
-        } else {
-            return null;
-        }
+        return minDistance <= SEARCH_DISTANCE_THRESHOLD ? closestMatch : null;
     }
 }

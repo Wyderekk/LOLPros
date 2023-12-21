@@ -24,6 +24,7 @@ import me.wyderekk.application.data.util.AccountDataUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @PageTitle("Ladder")
@@ -38,49 +39,77 @@ public class LadderView extends VerticalLayout {
     }
 
     private void initializeUI() {
+        VirtualList<AccountData> accountDataVirtualList = createAccountDataVirtualList();
 
-        ArrayList<AccountData> accountDataArrayList = SQLite.getSortedAccountData(SortBy.CURRENT_RANK);
-        VirtualList<AccountData> accountDataVirtualList = new VirtualList<>();
-        accountDataVirtualList.setDataProvider(DataProvider.ofCollection(accountDataArrayList));
-        accountDataVirtualList.setRenderer(accountDataComponentRenderer);
-        accountDataVirtualList.setHeightFull();
+        // Create the UI components for sorting and filtering
+        ComboBox<String> sortByComboBox = createSortByComboBox();
+        ComboBox<String> positionComboBox = createPositionComboBox();
 
-        Div card = new Div();
-        card.setClassName("header");
+        // Add value change listeners to update the list based on selections
+        addValueChangeListeners(positionComboBox, sortByComboBox, accountDataVirtualList);
 
-        HorizontalLayout headerLayout = new HorizontalLayout();
-        headerLayout.setClassName("header-layout");
-        headerLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        Div card = createHeaderLayout(sortByComboBox, positionComboBox);
 
-        ComboBox<String> sortByComboBox = new ComboBox<>();
-        List<String> sortByList = new ArrayList<>(Arrays.stream(SortBy.values()).map(SortBy::getName).toList());
-
-        sortByComboBox.setItems(sortByList);
-        sortByComboBox.setValue(SortBy.CURRENT_RANK.getName());
-        sortByComboBox.getElement().getStyle().set("margin-right", "10px");
-
-        ComboBox<String> positionComboBox = new ComboBox<>();
-        List<String> positionList = new ArrayList<>(Stream.concat(Stream.of("All"), Arrays.stream(Position.values()).map(Position::getName)).toList());
-        positionComboBox.setItems(positionList);
-        positionComboBox.setValue("All");
-        positionComboBox.getElement().getStyle().set("margin-left", "10px");
-
-        positionComboBox.addValueChangeListener(valueChanged -> updateAccountDataList(positionComboBox, sortByComboBox, accountDataVirtualList));
-        sortByComboBox.addValueChangeListener(valueChanged -> updateAccountDataList(positionComboBox, sortByComboBox, accountDataVirtualList));
-
-
-        headerLayout.add(sortByComboBox, new Span(" "), positionComboBox);
-
-        card.add(headerLayout);
-
+        // Setup the main container with the list
         Div container = new Div(accountDataVirtualList);
         container.setClassName("list-container");
 
+        // Configure the main layout properties
         setHeightFull();
         setWidthFull();
         setAlignItems(Alignment.CENTER);
 
         add(card, container);
+    }
+
+    private VirtualList<AccountData> createAccountDataVirtualList() {
+        ArrayList<AccountData> accountDataArrayList = SQLite.getSortedAccountData(SortBy.CURRENT_RANK);
+        VirtualList<AccountData> accountDataVirtualList = new VirtualList<>();
+        accountDataVirtualList.setDataProvider(DataProvider.ofCollection(accountDataArrayList));
+        accountDataVirtualList.setRenderer(accountDataComponentRenderer);
+        accountDataVirtualList.setHeightFull();
+        return accountDataVirtualList;
+    }
+
+    private ComboBox<String> createSortByComboBox() {
+        ComboBox<String> sortByComboBox = new ComboBox<>();
+        List<String> sortByList = Arrays.stream(SortBy.values())
+                .map(SortBy::getName)
+                .collect(Collectors.toList());
+        sortByComboBox.setItems(sortByList);
+        sortByComboBox.setValue(SortBy.CURRENT_RANK.getName());
+        sortByComboBox.getElement().getStyle().set("margin-right", "10px");
+        return sortByComboBox;
+    }
+
+    private ComboBox<String> createPositionComboBox() {
+        ComboBox<String> positionComboBox = new ComboBox<>();
+        List<String> positionList = Stream.concat(Stream.of("All"), Arrays.stream(Position.values())
+                        .map(Position::getName))
+                .collect(Collectors.toList());
+        positionComboBox.setItems(positionList);
+        positionComboBox.setValue("All");
+        positionComboBox.getElement().getStyle().set("margin-left", "10px");
+        return positionComboBox;
+    }
+
+    private void addValueChangeListeners(ComboBox<String> positionComboBox, ComboBox<String> sortByComboBox,
+                                         VirtualList<AccountData> accountDataVirtualList) {
+        positionComboBox.addValueChangeListener(
+                e -> updateAccountDataList(positionComboBox, sortByComboBox, accountDataVirtualList));
+        sortByComboBox.addValueChangeListener(
+                e -> updateAccountDataList(positionComboBox, sortByComboBox, accountDataVirtualList));
+    }
+
+    private Div createHeaderLayout(ComboBox<String> sortByComboBox, ComboBox<String> positionComboBox) {
+        Div card = new Div();
+        card.setClassName("header");
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setClassName("header-layout");
+        headerLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        headerLayout.add(sortByComboBox, new Span(" "), positionComboBox);
+        card.add(headerLayout);
+        return card;
     }
 
     private ComponentRenderer<HorizontalLayout, AccountData> accountDataComponentRenderer = new ComponentRenderer<>(
